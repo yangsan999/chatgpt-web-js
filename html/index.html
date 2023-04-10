@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<head>
+  <meta charset="utf-8" />
+  <title>聪明AI，让你的生活更轻松</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div style="display: none">
+    <object type="image/svg+xml" data="optionIcon.svg"></object>
+  </div>
+  <div id="loadMask">
+    <div>
+      <div>聪明AI</div>
+      <svg>
+        <use xlink:href="optionIcon.svg#loadingIcon" />
+      </svg>
+    </div>
+  </div>
+  <div class="chat_window">
+    <div class="overlay"></div>
+    <nav class="nav">
+      <div id="newChat">
+        <svg width="24" height="24">
+          <use xlink:href="optionIcon.svg#addIcon" />
+        </svg>
+        <span>新建会话</span>
+      </div>
+      <div id="chatList"></div>
+      <div class="navFooter">
+        <div class="navFunc">
+          <div id="exportChat">
+            <svg width="24" height="24">
+              <use xlink:href="optionIcon.svg#exportIcon" />
+            </svg>
+            <span>导出</span>
+          </div>
+          <label id="importChat" for="importChatInput">
+            <svg width="24" height="24">
+              <use xlink:href="optionIcon.svg#importIcon" />
+            </svg>
+            <span>导入</span>
+          </label>
+          <input type="file" style="display: none" id="importChatInput" accept="application/json" />
+          <div id="clearChat">
+            <svg width="24" height="24">
+              <use xlink:href="optionIcon.svg#clearAllIcon" />
+            </svg>
+            <span>清空</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="links"></div>
+      </div>
+    </nav>
+    <div class="top_menu">
+      <div class="toggler">
+        <div class="button close"></div>
+        <div class="button minimize"></div>
+        <div class="button maximize"></div>
+      </div>
+      <div class="title">聪明AI</div>
+      <button id="setting">
+        <svg viewBox="0 0 100 100" style="display: block" role="img" width="30" height="30">
+          <title>设置</title>
+          <circle cx="50" cy="20" r="10" fill="#e15b64" />
+          <circle cx="50" cy="50" r="10" fill="#f8b26a" />
+          <circle cx="50" cy="80" r="10" fill="#99c959" />
+        </svg>
+      </button>
+      <div id="setDialog" style="display: none">
+        <div class="setSwitch">
+          <div data-id="convOption" class="activeSwitch">对话</div>
+          <div data-id="speechOption">语音合成</div>
+          <div data-id="recOption">语音识别</div>
+        </div>
+        <div id="convOption">
+          <div class="presetSelect presetModelCls" style="display: none">
+            <label for="preSetModel">GPT模型</label>
+            <select id="preSetModel">
+              <option value="gpt-3.5-turbo">gpt-3.5</option>
+              <option value="gpt-4">gpt-4</option>
+              <option value="gpt-4-32k">gpt-4-32k</option>
+            </select>
+          </div>
+          <div style="display: none">
+            <div>自定义接口</div>
+            <input class="inputTextClass" placeholder="https://example.com/" id="apiHostInput" />
+          </div>
+          <div style="display: none">
+            <div>自定义API key</div>
+            <input class="inputTextClass" type="password" placeholder="sk-xxxxxx" id="keyInput"
+              style="-webkit-text-security: disc" />
+          </div>
+          <div>
+            <div class="justSetLine presetSelect">
+              <div>系统角色</div>
+              <div>
+                <label for="preSetSystem">预设角色</label>
+                <select id="preSetSystem">
+                  <option value="">默认</option>
+                  <option value="normal">助手</option>
+                  <option value="cat">猫娘</option>
+                  <option value="emoji">表情</option>
+                  <option value="image">有图</option>
+                </select>
+              </div>
+            </div>
+            <textarea class="inputTextClass areaTextClass" placeholder="你是一个乐于助人的助手，尽量简明扼要地回答，使用Markdown格式回复。"
+              id="systemInput"></textarea>
+          </div>
+          <div>
+            <span>角色性格</span>
+            <input type="range" id="top_p" min="0" max="1" value="1" step="0.05" />
+            <div class="selectDef">
+              <span>准确严谨</span>
+              <span>灵活创新</span>
+            </div>
+          </div>
+          <div>
+            <span>回答质量</span>
+            <input type="range" id="temp" min="0" max="2" value="1" step="0.05" />
+            <div class="selectDef">
+              <span>重复刻板</span>
+              <span>胡言乱语</span>
+            </div>
+          </div>
+          <div>
+            <span>打字机速度</span>
+            <input type="range" id="textSpeed" min="0" max="100" value="88" step="1" />
+            <div class="selectDef">
+              <span>慢</span>
+              <span>快</span>
+            </div>
+          </div>
+          <div>
+            <span class="inlineTitle">连续对话</span>
+            <label class="switch-slide">
+              <input type="checkbox" id="enableCont" checked hidden />
+              <label for="enableCont" class="switch-slide-label"></label>
+            </label>
+          </div>
+          <div>
+            <span class="inlineTitle">长回复</span>
+            <label class="switch-slide">
+              <input type="checkbox" id="enableLongReply" hidden />
+              <label for="enableLongReply" class="switch-slide-label"></label>
+            </label>
+          </div>
+        </div>
+        <div id="speechOption" style="display: none">
+          <div class="presetSelect presetModelCls">
+            <label for="preSetService">语音合成服务</label>
+            <select id="preSetService">
+              <option value="3">Azure语音</option>
+              <option selected value="2">Edge语音</option>
+              <option value="1">系统语音</option>
+            </select>
+          </div>
+          <div class="presetSelect presetModelCls">
+            <label for="preSetAzureRegion">Azure 区域</label>
+            <select id="preSetAzureRegion"></select>
+          </div>
+          <div>
+            <div>Azure Access Key</div>
+            <input class="inputTextClass" type="password" placeholder="Azure Key" id="azureKeyInput"
+              style="-webkit-text-security: disc" />
+          </div>
+          <div id="checkVoiceLoad" style="display: none">
+            <svg>
+              <use xlink:href="optionIcon.svg#loadingIcon" />
+            </svg>
+            <span>加载语音</span>
+          </div>
+          <div id="speechDetail">
+            <div>
+              <div class="justSetLine">
+                <div>语音类型</div>
+                <div id="voiceTypes">
+                  <span data-type="0">提问语音</span>
+                  <span data-type="1" class="selVoiceType">回答语音</span>
+                </div>
+              </div>
+              <select id="preSetSpeech"></select>
+            </div>
+            <div class="justSetLine presetSelect" id="azureExtra" style="display: none">
+              <div class="presetModelCls">
+                <label for="preSetVoiceStyle">风格</label>
+                <select id="preSetVoiceStyle"></select>
+              </div>
+              <div class="presetModelCls">
+                <label for="preSetVoiceRole">角色</label>
+                <select id="preSetVoiceRole"></select>
+              </div>
+            </div>
+            <div>
+              <span>音量</span>
+              <input type="range" id="voiceVolume" min="0" max="1" value="1" step="0.1" />
+              <div class="selectDef">
+                <span>低</span>
+                <span>高</span>
+              </div>
+            </div>
+            <div>
+              <span>语速</span>
+              <input type="range" id="voiceRate" min="0.1" max="2" value="1" step="0.1" />
+              <div class="selectDef">
+                <span>慢</span>
+                <span>快</span>
+              </div>
+            </div>
+            <div>
+              <span>音调</span>
+              <input type="range" id="voicePitch" min="0" max="2" value="1" step="0.1" />
+              <div class="selectDef">
+                <span>平淡</span>
+                <span>起伏</span>
+              </div>
+            </div>
+            <div>
+              <span class="inlineTitle">连续朗读</span>
+              <label class="switch-slide">
+                <input type="checkbox" id="enableContVoice" checked hidden />
+                <label for="enableContVoice" class="switch-slide-label"></label>
+              </label>
+            </div>
+            <div>
+              <span class="inlineTitle">自动朗读</span>
+              <label class="switch-slide">
+                <input type="checkbox" id="enableAutoVoice" hidden />
+                <label for="enableAutoVoice" class="switch-slide-label"></label>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div id="recOption" style="display: none">
+          <div id="noRecTip" style="display: block">
+            当前环境不支持语音识别，请尝试使用chrome内核浏览器或重新部署https页面。
+          </div>
+          <div id="yesRec" style="display: none">
+            <div class="presetSelect presetModelCls">
+              <label for="selectLangOption">语言</label>
+              <select id="selectLangOption"></select>
+            </div>
+            <div class="presetSelect presetModelCls">
+              <label for="selectDiaOption">方言</label>
+              <select id="selectDiaOption"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="messages">
+      <div id="chatlog"></div>
+      <div id="stopChat">
+        <svg width="24" height="24">
+          <use xlink:href="optionIcon.svg#stopResIcon" />
+        </svg>停止
+      </div>
+    </div>
+    <div class="bottom_wrapper clearfix">
+      <div class="message_input_wrapper">
+        <textarea class="message_input_text" spellcheck="false" placeholder="请文明守法提问...（Shfit + Enter = 换行）"
+          id="chatinput"></textarea>
+        <div id="voiceRec" style="display: none">
+          <div id="voiceRecIcon">
+            <svg viewBox="0 0 48 48" id="voiceInputIcon">
+              <g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4">
+                <rect fill="none" width="14" height="27" x="17" y="4" rx="7" />
+                <rect class="animVoice" x="18" y="4" width="12" height="27" stroke="none" fill="currentColor"></rect>
+                <path stroke-linecap="round" d="M9 23c0 8.284 6.716 15 15 15c8.284 0 15-6.716 15-15M24 38v6" />
+              </g>
+            </svg>
+          </div>
+          <div id="voiceRecSetting">
+            <select id="select_language" style="margin-bottom: 4px"></select>
+            <select id="select_dialect"></select>
+          </div>
+        </div>
+      </div>
+      <button class="loaded" id="sendbutton">
+        <span>发送</span>
+        <svg style="margin: 0 auto; height: 40px; width: 100%">
+          <use xlink:href="optionIcon.svg#loadingIcon" />
+        </svg>
+      </button>
+      <button id="clearConv">
+        <svg style="margin: 0 auto; display: block" role="img" width="20px" height="20px">
+          <title>清空会话</title>
+          <use xlink:href="optionIcon.svg#deleteIcon" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  <link rel="stylesheet" href="//cdn.staticfile.org/notyf/3.10.0/notyf.min.css" />
+  <script src="//cdn.staticfile.org/notyf/3.10.0/notyf.min.js"></script>
+  <script src="input_script.js"></script>
+  <script src="//cdn.staticfile.org/markdown-it/13.0.1/markdown-it.min.js"></script>
+  <script src="//cdn.staticfile.org/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="//cdn.staticfile.org/KaTeX/0.16.4/katex.min.js"></script>
+  <script src="//npm.elemecdn.com/markdown-it-texmath@1.0.0/texmath.js"></script>
+  <script src="//npm.elemecdn.com/markdown-it-link-attributes@4.0.1/dist/markdown-it-link-attributes.min.js"></script>
+  <script src="api_script.js"></script>
+  <link href="//cdn.staticfile.org/github-markdown-css/5.2.0/github-markdown-light.min.css" rel="stylesheet" />
+  <link href="//cdn.staticfile.org/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet" />
+  <link href="//cdn.staticfile.org/KaTeX/0.16.4/katex.min.css" rel="stylesheet" />
+  <link href="//npm.elemecdn.com/markdown-it-texmath@1.0.0/css/texmath.css" rel="stylesheet" />
+  <script defer src="prompts_script.js"></script>
+</body>
+</html>
